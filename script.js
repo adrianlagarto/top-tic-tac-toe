@@ -10,11 +10,21 @@ const GameBoard = (() => {
     document.querySelector('#gameboard').innerHTML = boardHTML;
     const squares = document.querySelectorAll(".square");
     squares.forEach((square) => {
-      square.addEventListener("click", Game.handleClick(event))
+      square.addEventListener("click", Game.handleClick)
     })
-  }
+  };
+
+  const update = (index, value) => {
+    gameboard[index] = value;
+    render();
+  };
+
+  const getGameboard = () => gameboard;
+
   return {
     render,
+    update,
+    getGameboard
   }
 })();
 
@@ -38,55 +48,79 @@ const Game = (() => {
     currentPlayerIndex = 0;
     gameOver = false;
     GameBoard.render();
+    const squares = document.querySelectorAll(".square");
+    squares.forEach((square) => {
+      square.addEventListener("click", handleClick)
+    })
   }
+
   const handleClick = (event) => {
-    console.log(event)
+    let index = parseInt(event.target.id.split("-")[1]);
+    if(gameOver){
+      return;
+    }
+    if(GameBoard.getGameboard()[index]!=="")
+      return;//disable picking the same square
+
+    GameBoard.update(index, players[currentPlayerIndex].mark);
+
+    if(checkForWin(GameBoard.getGameboard(), players[currentPlayerIndex].mark)){
+      gameOver = true;
+      alert(`${players[currentPlayerIndex].name} won`)
+    }else if(checkForTie(GameBoard.getGameboard())) {
+      gameOver = true;
+      alert('its a tie')
+    }
+    currentPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;//alternate turn of the playeer
   }
+
+  function checkForWin(board) {
+    const winningCombinations = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ]
+    for(let i=0; i< winningCombinations.length;i++){
+      const [a, b, c] = winningCombinations[i];
+      if(board[a] && board[a] === board[b] && board[a] === board[c]){
+        return true
+      }
+    }
+    return false;
+  }
+
+  function checkForTie (board){
+    return board.every(cell =>cell !=="");
+
+  }
+
+  const restart = () => {
+    for(let i = 0; i < 9;i++){
+      GameBoard.update(i, "");
+    }
+    GameBoard.render();
+  }
+
   return {
     start,
+    restart,
     handleClick
   }
 })();
 
-const startButton = document.querySelector('#start-btn');
-startButton.addEventListener("click", () => {
-  console.log('start')
-  Game.start();
-  console.log('finish')
+const restartButton = document.querySelector("#reset-btn");
+restartButton.addEventListener("click", () => {
+  Game.restart();
+  console.log('qwe')
 })
 
-
-const playerChoosingSquare = (name, mark, index) => {
-  //checks if the square container has "X" "O"
-  //only fill up the empty square
-  //update the divs when player pick the divs
-}
-
-/*
-const playerChoose = document.querySelector('.square');
-  playerChoose.addEventListener("click", () => {
-    playerChoosingSquare(mark, index);
-    GameBoard.render();
-    //gameboard.render at the end to update
-  })();
-*/
-
-// button on divs to check for 
-/*
-winning combinations to check every move
-
-[0, 1, 2],
-[ 3, 4, 5],
-[ 6, 7, 8],
-[ 0, 3, 6],
-[ 1, 4, 7],
-[ 2, 5, 8],
-[ 0, 4, 8],
-[ 2, 4, 6],
-
-*/
-
-//checks game every move to see who wins
-//prevent player from picking taken spots already
-//show the result upon game ends
+const startButton = document.querySelector('#start-btn');
+startButton.addEventListener("click", () => {
+  Game.start();
+})
 

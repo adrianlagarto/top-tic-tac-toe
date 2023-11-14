@@ -32,6 +32,14 @@ body{
   font-size: 80px;
 }
 
-.control{
+#control{
   margin:3rem;
+  display: flex;
+  align-items: center;
+  align-items: center;
+  gap:1rem;
+}
+
+#control button{
+  padding:.5rem 2rem;
 }

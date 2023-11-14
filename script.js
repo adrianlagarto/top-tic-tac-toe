@@ -1,3 +1,11 @@
+const displayController = (() => {
+  const renderMessage = (message) => {
+    document.querySelector("#message").innerHTML = message;
+  }
+  return {
+    renderMessage
+  }
+})();
 
 const GameBoard = (() => {
   let gameboard = ["", "", "", "", "", "", "", "", ""]
@@ -44,14 +52,14 @@ const Game = (() => {
     players = [
       createPlayer(document.querySelector('#player1').value, 'X'),
       createPlayer(document.querySelector('#player2').value, 'O')
-    ]
+    ];
     currentPlayerIndex = 0;
     gameOver = false;
     GameBoard.render();
     const squares = document.querySelectorAll(".square");
     squares.forEach((square) => {
       square.addEventListener("click", handleClick)
-    })
+    });
   }
 
   const handleClick = (event) => {
@@ -66,10 +74,10 @@ const Game = (() => {
 
     if(checkForWin(GameBoard.getGameboard(), players[currentPlayerIndex].mark)){
       gameOver = true;
-      alert(`${players[currentPlayerIndex].name} won`)
+      displayController.renderMessage(`${players[currentPlayerIndex].name} wins`);
     }else if(checkForTie(GameBoard.getGameboard())) {
       gameOver = true;
-      alert('its a tie')
+      displayController.renderMessage("It's a tie!");
     }
     currentPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;//alternate turn of the playeer
   }
@@ -84,11 +92,11 @@ const Game = (() => {
       [2, 5, 8],
       [0, 4, 8],
       [2, 4, 6],
-    ]
+    ];
     for(let i=0; i< winningCombinations.length;i++){
       const [a, b, c] = winningCombinations[i];
       if(board[a] && board[a] === board[b] && board[a] === board[c]){
-        return true
+        return true;
       }
     }
     return false;
@@ -96,7 +104,6 @@ const Game = (() => {
 
   function checkForTie (board){
     return board.every(cell =>cell !=="");
-
   }
 
   const restart = () => {
@@ -104,6 +111,8 @@ const Game = (() => {
       GameBoard.update(i, "");
     }
     GameBoard.render();
+    gameOver = false;
+    document.querySelector("#message").innerHTML = "";
   }
 
   return {
@@ -116,11 +125,9 @@ const Game = (() => {
 const restartButton = document.querySelector("#reset-btn");
 restartButton.addEventListener("click", () => {
   Game.restart();
-  console.log('qwe')
-})
+});
 
 const startButton = document.querySelector('#start-btn');
 startButton.addEventListener("click", () => {
   Game.start();
-})
-
+});
